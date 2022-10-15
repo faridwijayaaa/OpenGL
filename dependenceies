@@ -1,0 +1,3 @@
+pip install pyopengl pyopengl_accelerate
+
+python version 3.8 ++ 
