@@ -9,7 +9,11 @@ from OpenGL.GLUT import *
 from OpenGL.GLU import *
 
 import sys
-import math
+
+translateA = 0
+translateB = 0
+skala = 1
+rotate = 0
 
 
 def init():
@@ -20,6 +24,7 @@ def init():
 def display():
     glColor(1.0, 1.0, 0.0, 0.0)
     glBegin(GL_POLYGON)
+
     # (X , Y)
     # left
     glVertex2f(220, 300)
@@ -52,63 +57,54 @@ def display():
     glVertex2f(250, 225)
 
     glEnd()
-    # glFlush()
-
-
-# ! Rotated
-initRootAngle = 0.0
-
-
-def animRotate():
-    global initRootAngle
-    glPushMatrix()
-    glRotate(initRootAngle, 0, 0, 1)
-    display()
-    initRootAngle += 1
-    glPopMatrix()
-    glFlush()
-
-
-# ! Translasi
-initTrans = 0.0
-
-
-def animTrans():
-    global initTrans
-    glPushMatrix()
-    glTranslatef(initTrans, initTrans, 0)
-    display()
-    initTrans += 1
-    glPopMatrix()
-    glFlush()
-
-
-# ! Skala
-initSkala = 0.0
-
-
-def animSkala():
-    global initSkala
-    glPushMatrix()
-    glScalef(initSkala, initSkala, 0)
-    display()
-    initSkala += 1
-    glPopMatrix()
-    glFlush()
-
-
-def timer():
-    glutPostRedisplay()
-    glutTimerFunc(10, timer, 5)
-    glFlush()
 
 
 def render():
     glClear(GL_COLOR_BUFFER_BIT)
-    # animRotate() # for Rotated
-    animSkala()  # for Skalation
-    # animTrans() # for Translation
+    glPushMatrix()
+    glTranslatef(translateA, translateB, 0)
+    glScalef(skala, skala, 0)
+    glRotate(rotate, 0, 0, 1)
+    display()
+    glPopMatrix()
     glFlush()
+
+
+def myKeyboard(key, x, y):
+    global rotate
+    if (key == b'a'):
+        rotate += 2
+    elif (key == b'd'):
+        rotate -= 2
+
+
+def mySpecialKeyboard(key, x, y):
+    global translateA, translateB, skala
+    if (key == GLUT_KEY_RIGHT):
+        translateA += 5
+        translateB += 0
+    elif (key == GLUT_KEY_LEFT):
+        translateA -= 5
+        translateB += 0
+    elif (key == GLUT_KEY_DOWN):
+        translateA += 0
+        translateB -= 5
+    elif (key == GLUT_KEY_UP):
+        translateA += 0
+        translateB += 5
+
+
+def mouse(button, state, x, y):
+    global skala
+    if (button == GLUT_LEFT_BUTTON and state == GLUT_DOWN):
+        skala += 0.05
+    elif (button == GLUT_RIGHT_BUTTON and state == GLUT_DOWN):
+        skala -= 0.05
+
+
+def timer(value):
+    glutPostRedisplay()
+    glutTimerFunc(50, timer, 0)
 
 
 def main():
@@ -117,9 +113,12 @@ def main():
     glutInitWindowSize(500, 600)
     glutInitWindowPosition(1020, 5)
     glutCreateWindow("OPENGL BRO")
-    glutDisplayFunc(render)
-    glutTimerFunc(10, timer, 5)
     init()
+    glutDisplayFunc(render)
+    glutSpecialFunc(mySpecialKeyboard)
+    glutKeyboardFunc(myKeyboard)
+    glutMouseFunc(mouse)
+    glutTimerFunc(10, timer, 5)
     glutMainLoop()
 
 
